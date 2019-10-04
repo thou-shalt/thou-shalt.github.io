@@ -1,0 +1,10 @@
+{
+  "name": "thou-shalt",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "p5": "^0.9.0"
+  }
+}
