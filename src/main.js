@@ -8,6 +8,6 @@ let thouShalt = new p5(( sketch ) => {
   
     sketch.draw = () => {
       sketch.fullscreen(); 
-      sketch.background(20,0,255);
+      sketch.background(2,3,5);
     };
   }, 'thou-shalt');
