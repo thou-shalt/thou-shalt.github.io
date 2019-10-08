@@ -47,7 +47,7 @@ float rectangle(in vec2 pos,
 
 void main() {
 
-  vec3 backgroundColor = hsv2rgb(vec3(0.61, 0.5, 0.01));
+  vec3 backgroundColor = hsv2rgb(vec3(0.61, 0.5, 0.1));
 
   vec3 rectColor = hsv2rgb(vec3(0.81, 1.0, 0.04));
 
