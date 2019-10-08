@@ -44,7 +44,7 @@ new p5((sk) => {
     loader = new heavyModule.AudioLibLoader();
 
     loader.init({
-      blockSize: 512, // number of samples on each audio processing block
+      blockSize: 2048, // number of samples on each audio processing block
       // printHook: onPrint, // callback for [print] messages, can be null
       // sendHook: onFloatMessage // callback for output parameters [s {name} @hv_param], can be null
     });
@@ -56,7 +56,7 @@ new p5((sk) => {
       } else {
         loader.stop();
       }
-      console.log(loader);
+      // console.log(loader);
     } else {
       heavyModule = ThouShalt_Module();
       heavyModule['onRuntimeInitialized'] = onModuleLoaded;
