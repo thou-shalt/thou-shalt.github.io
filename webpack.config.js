@@ -22,5 +22,13 @@ module.exports = {
     contentBase: __dirname,
     compress: true,
     port: 9000
-  }
+  },
+  // node: {
+    // dns: 'mock',
+  //   fs: 'empty',
+  //   path: true,
+  //   url: false,
+  //   dgram: 'empty', 
+  //   child_process: 'empty'
+  // }
 };

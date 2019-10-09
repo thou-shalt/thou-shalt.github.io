@@ -4,6 +4,8 @@ precision mediump float;
 // we need to declare it here too!
 varying vec2 vTexCoord;
 
+
+
 void main() {
 
   // copy the vTexCoord

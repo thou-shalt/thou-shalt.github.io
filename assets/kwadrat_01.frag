@@ -12,6 +12,8 @@ uniform vec2 uResolution;
 uniform vec2 uMouse;
 uniform float uTime;
 
+uniform vec3 uBackgroundColor;
+
 vec3 hsv2rgb(in vec3 c){
   vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
   vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
@@ -47,7 +49,7 @@ float rectangle(in vec2 pos,
 
 void main() {
 
-  vec3 backgroundColor = hsv2rgb(vec3(0.61, 0.5, 0.1));
+  vec3 backgroundColor = uBackgroundColor;
 
   vec3 rectColor = hsv2rgb(vec3(0.81, 1.0, 0.04));
 

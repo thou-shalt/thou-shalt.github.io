@@ -1,10 +1,21 @@
 import p5 from './p5.min.js';
+import convert from 'color-convert';
 import ThouShalt_Module from '../assets/ThouShalt/js/ThouShalt.js'
+// import osc from 'osc';
+
+/* const port = new osc.WebSocketPort({
+  url: "ws://localhost:8081"
+});
+
+port.on("message", (oscMessage) => {
+  console.log("message", oscMessage);
+});
+*/
 
 new p5((sk) => {
   const fragPath = 'assets/kwadrat_01.frag';
   const drawText = false;
-  let font, kwadrat, strokeColor, heavyModule, loader;
+  let font, kwadrat, strokeColor, heavyModule, loader, bc;
   sk.preload = () => {
     if (drawText) {
       font = sk.loadFont('assets/OCR-ABT.otf');
@@ -18,6 +29,9 @@ new p5((sk) => {
     strokeColor = sk.color(12, 3, 5);
     sk.stroke(strokeColor);
     sk.shader(kwadrat);
+    bc =  convert.cmyk.rgb(100.0,0.0,42.0,15.0).map(x => x / 256);
+    kwadrat.setUniform("uBackgroundColor",bc);
+    console.log(bc);
   };
 
   sk.draw = () => {

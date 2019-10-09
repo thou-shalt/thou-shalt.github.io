@@ -9,9 +9,9 @@
     "start:dev": "node_modules/.bin/webpack-dev-server"
   },
   "dependencies": {
-    "flocking": "^2.0.1",
+    "color-convert": "^2.0.1",
     "osc": "^2.3.1",
-    "webpd": "^0.4.2"
+    "ws": "^7.1.2"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
