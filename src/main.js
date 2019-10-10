@@ -4,14 +4,26 @@ import ThouShalt_Module from '../assets/ThouShalt/js/ThouShalt.js'
 import OSC from 'osc-js';
 
 
-let osc = new OSC();
-osc.open({
-  host: 'localhost',
-  port: 8081
-});
-osc.on('*', (message) => {
-  console.log(message)
-})
+const plugin = new OSC.WebsocketClientPlugin();
+const osc = new OSC(plugin);
+console.log('status 1 : ' + osc.status());
+let isOpen;
+try {
+  osc.open({
+    host: 'localhost',
+    port: 8081
+  });
+  isOpen = true;
+  osc.on('*', (message) => {
+    console.log(message)
+  });
+
+  console.log(isOpen);
+  console.log('status 2 : ' + osc.status());
+} catch (error) {
+}
+
+console.log('socket: ' + plugin.status());
 
 /*
 import osc1 from 'osc'  ;
