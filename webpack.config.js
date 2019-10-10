@@ -23,12 +23,10 @@ module.exports = {
     compress: true,
     port: 9000
   },
-  // node: {
-    // dns: 'mock',
-  //   fs: 'empty',
-  //   path: true,
-  //   url: false,
-  //   dgram: 'empty', 
-  //   child_process: 'empty'
-  // }
+  externals: {
+    osc: 'osc'
+  },
+  node: {
+    dgram: 'empty'
+  }
 };

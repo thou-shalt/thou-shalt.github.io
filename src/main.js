@@ -1,14 +1,25 @@
 import p5 from './p5.min.js';
 import convert from 'color-convert';
 import ThouShalt_Module from '../assets/ThouShalt/js/ThouShalt.js'
-// import osc from 'osc';
+import OSC from 'osc-js';
 
-/* const port = new osc.WebSocketPort({
-  url: "ws://localhost:8081"
+
+let osc = new OSC();
+osc.open({
+  host: 'localhost',
+  port: 8081
 });
+osc.on('*', (message) => {
+  console.log(message)
+})
 
+/*
+import osc1 from 'osc'  ;
+const port = new osc1.WebSocketPort({
+  socket: new WebSocket('ws://localhost:8081')
+});
 port.on("message", (oscMessage) => {
-  console.log("message", oscMessage);
+    console.log("message", oscMessage);
 });
 */
 
@@ -50,7 +61,7 @@ new p5((sk) => {
       sk.text('THOU SHALT', sk.width / 2, sk.height / 2);
     }
   };
-  
+
   sk.windowResized = () => {
     sk.resizeCanvas(window.innerWidth, window.innerHeight);
   };
@@ -76,6 +87,7 @@ new p5((sk) => {
       heavyModule['onRuntimeInitialized'] = onModuleLoaded;
     }
   }
-  
-  
+
+
+
 }, 'thou-shalt');
