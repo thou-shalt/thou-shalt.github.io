@@ -10,6 +10,7 @@ WORKDIR /opt/app
 COPY index.js index.js 
 COPY package.json package.json
 
-RUN apk add make g++ python linux-headers udev && npm install 
+RUN apk add make g++ python linux-headers udev && npm install && \
+    apk del make g++ python linux-headers udev
 
 ENTRYPOINT node index.js
