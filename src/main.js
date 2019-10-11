@@ -1,81 +1,113 @@
 import p5 from './p5.min.js';
 import convert from 'color-convert';
 import ThouShalt_Module from '../assets/ThouShalt/js/ThouShalt.js'
-import OSC from 'osc-js';
+import osc from 'osc';
 
-
-const plugin = new OSC.WebsocketClientPlugin();
-const osc = new OSC(plugin);
-console.log('status 1 : ' + osc.status());
-let isOpen;
-try {
-  osc.open({
-    host: 'localhost',
-    port: 8081
+let ws;
+let port;
+function makeOsc() {
+  ws = new WebSocket('ws://localhost:8081');
+  
+ 
+  // ws.onclose = function(e) {
+  //   setTimeout( function () {
+  //     ws = null;
+  //   console.log('reconnencting');   
+  //     makeOsc();
+  //   }, 100)
+  // };
+  ws.onerror = function(e) {
+  setTimeout( function () {
+    console.log('reconnencting');   
+      makeOsc();
+    }, 100) 
+  };
+  port = new osc.WebSocketPort({
+    socket: ws
   });
-  isOpen = true;
-  osc.on('*', (message) => {
-    console.log(message)
-  });
-
-  console.log(isOpen);
-  console.log('status 2 : ' + osc.status());
-} catch (error) {
-}
-
-console.log('socket: ' + plugin.status());
-
-/*
-import osc1 from 'osc'  ;
-const port = new osc1.WebSocketPort({
-  socket: new WebSocket('ws://localhost:8081')
-});
-port.on("message", (oscMessage) => {
+  port.on("message", (oscMessage) => {
     console.log("message", oscMessage);
-});
-*/
+  });
+}
+makeOsc();
 
-new p5((sk) => {
+// import OSC from 'osc-js';
+
+// const options = {
+//   host: 'localhost',
+//   port: 8081
+// };
+//   let plugin;;
+// let osc;
+
+// const makeOsc = () => {
+//   plugin = new OSC.WebsocketClientPlugin(options);
+  
+//   osc = new OSC({ plugin: plugin });
+//   osc.open();
+
+//   osc.on('*', (msg) => {
+//     console.log(msg)
+//   });
+  
+// }
+// makeOsc();
+// plugin.notify = (msg) => {
+//   if (msg === 'close') {
+//     setTimeout(() => {
+//       console.log("timeout")
+//       osc.open();
+//       osc.on('*', (msg) => {
+//         // t = msg;
+//         console.log(msg)
+//       });
+
+//     }, 5000);
+//     console.error(`ws is ${msg}d -> reconnecting in 5 secs...`);
+//   }
+// };
+new p5((s) => {
   const fragPath = 'assets/kwadrat_01.frag';
   const drawText = false;
   let font, kwadrat, strokeColor, heavyModule, loader, bc;
-  sk.preload = () => {
+  let t = 'test';
+  s.preload = () => {
     if (drawText) {
-      font = sk.loadFont('assets/OCR-ABT.otf');
+      font = s.loadFont('assets/OCR-ABT.otf');
     }
-    kwadrat = sk.loadShader('assets/basic.vert', fragPath);
-
+    kwadrat = s.loadShader('assets/basic.vert', fragPath);
   };
-  sk.setup = () => {
-    let cnv = sk.createCanvas(window.innerWidth, window.innerHeight, sk.WEBGL);
+  s.setup = () => {
+    let cnv = s.createCanvas(window.innerWidth, window.innerHeight, s.WEBGL);
     cnv.canvas.style.display = 'block';
-    strokeColor = sk.color(12, 3, 5);
-    sk.stroke(strokeColor);
-    sk.shader(kwadrat);
-    bc =  convert.cmyk.rgb(100.0,0.0,42.0,15.0).map(x => x / 256);
-    kwadrat.setUniform("uBackgroundColor",bc);
+    strokeColor = s.color(12, 3, 5);
+    s.stroke(strokeColor);
+    s.shader(kwadrat);
+    bc = convert.cmyk.rgb(100.0, 40.0, 42.0, 85.0).map(x => x / 256);
+    kwadrat.setUniform("uBackgroundColor", bc);
     console.log(bc);
   };
 
-  sk.draw = () => {
+  s.draw = () => {
+    // console.log(ws);
     let z = 1.0;
-    kwadrat.setUniform("uResolution", [sk.width, sk.height]);
-    kwadrat.setUniform("uMouse", [sk.mouseX, sk.mouseY ]);
-    kwadrat.setUniform("uTime", sk.millis()%(sk.width/8.0));
-    sk.quad(-1, -1, z, 1, -1, z, 1, 1, z, -1,1, z);
+    kwadrat.setUniform("uResolution", [s.width, s.height]);
+    kwadrat.setUniform("uMouse", [s.mouseX, s.mouseY]);
+    kwadrat.setUniform("uTime", s.millis() % (s.width / 8.0));
+    s.quad(-1, -1, z, 1, -1, z, 1, 1, z, -1, 1, z);
 
     if (drawText) {
-      sk.translate(-sk.width / 2, -sk.height / 2, 0);
-      sk.textSize(sk.height / 4);
-      sk.textFont(font);
-      sk.fill(strokeColor);
-      sk.textAlign(sk.CENTER);
-      sk.text('THOU SHALT', sk.width / 2, sk.height / 2);
+      s.translate(-s.width / 2, -s.height / 2, 0);
+      s.textSize(s.height / 4);
+      s.textFont(font);
+      s.fill(strokeColor);
+      s.textAlign(s.CENTER);
+      s.text('THOU SHALT', s.width / 2, s.height / 2);
     }
   };
 
-  sk.windowResized = () => {
-    sk.resizeCanvas(window.innerWidth, window.innerHeight);
+  s.windowResized = () => {
+    s.resizeCanvas(window.innerWidth, window.innerHeight);
   };
   const onModuleLoaded = () => {
     loader = new heavyModule.AudioLibLoader();
@@ -86,7 +118,7 @@ new p5((sk) => {
       // sendHook: onFloatMessage // callback for output parameters [s {name} @hv_param], can be null
     });
   }
-  sk.mouseClicked = () => {
+  s.mouseClicked = () => {
     if (loader) {
       if (!loader.isPlaying) {
         loader.start();
@@ -99,7 +131,15 @@ new p5((sk) => {
       heavyModule['onRuntimeInitialized'] = onModuleLoaded;
     }
   }
-
-
-
+  
 }, 'thou-shalt');
+
+/*
+import osc1 from 'osc'  ;
+const port = new osc1.WebSocketPort({
+  socket: new WebSocket('ws://localhost:8081')
+});
+port.on("message", (oscMessage) => {
+    console.log("message", oscMessage);
+});
+*/
