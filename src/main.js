@@ -6,7 +6,7 @@ import osc from 'osc';
 let ws;
 let port;
 function makeOsc() {
-  ws = new WebSocket('ws://localhost:8081');
+  ws = new WebSocket('ws://52.18.50.138:8081');
   
  
   // ws.onclose = function(e) {
