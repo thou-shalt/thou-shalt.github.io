@@ -7,4 +7,4 @@ runcmd:
  - systemctl start docker 
  - sudo systemctl enable docker 
  - [ sh, -c, "usermod -a -G docker ec2-user" ]
- - [ sh, -c, "docker run -p 57121:57121/udp -p 8081:8081 -d thoushalt/osc:latest" ]
+ - [ sh, -c, "sudo docker run -p 57121:57121/udp -p 8081:8081 -d thoushalt/osc:latest" ]
