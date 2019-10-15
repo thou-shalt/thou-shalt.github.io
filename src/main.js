@@ -50,7 +50,7 @@ new p5((s) => {
         s.shader(kwadrat);
         s.noStroke();
         s.frameRate(25);
-        bc = convert.cmyk.rgb(40.0, 100.0, 42.0, 24.0);
+        bc = convert.cmyk.rgb(40.0, 100.0, 42.0, 84.0);
         fc = convert.cmyk.rgb(50.0, 50.0, 42.0, 54.0);
         // kwadrat.setUniform("uBackgroundColor", bc.map(x => x / 256));
         console.log(bc);
@@ -62,17 +62,18 @@ new p5((s) => {
         pg.fill(...fc);
         pg.textSize(48);
         pg.text('thou shalt net',s.width / 2, s.height / 2);
-        // kwadrat.setUniform("tex0", pg);
+        kwadrat.setUniform("tex0", pg);
     };
 
     s.draw = () => {
+        s.camera(0, 0, 20 + s.sin(s.frameCount * 0.01) * 10, 0, 0, 0, 0, 1, 0);
+        // console.log(s.frameCount );
         let z = 1.0;
-        kwadrat.setUniform("tex0", pg);
+        // kwadrat.setUniform("tex0", pg);
         // kwadrat.setUniform("uResolution", [s.width, s.height]);
         // kwadrat.setUniform("uMouse", [s.mouseX, s.mouseY]);
         // kwadrat.setUniform("uTime", s.millis() % (s.width / 8.0));
         s.quad(-1, -1, z, 1, -1, z, 1, 1, z, -1, 1, z);
-        // s.plane();
 
     };
 
