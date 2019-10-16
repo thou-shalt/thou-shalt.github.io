@@ -1,6 +1,7 @@
 import p5 from './p5.min.js';
 import convert from 'color-convert';
 import ThouShalt_Module from '../assets/ThouShalt/js/ThouShalt.js';
+import Test_Module from 'Test';
 import OSC from 'osc-js';
 
 const options = {
@@ -36,7 +37,8 @@ new p5((s) => {
         loader,
         bc,
         fc,
-        pg;
+        pg,
+        waveformBuf;
     s.preload = () => {
         if (drawText) {
             font = s.loadFont('assets/OCRA.otf');
@@ -46,7 +48,10 @@ new p5((s) => {
         fetch('assets/waveform.txt')
             .then(response => response.text())
             .then((data) => {
-                console.log(data);
+                waveformBuf = Float32Array.from(
+                    data.split(/\r?\n/).map((v,i) => parseFloat(v)));
+                waveformBuf = waveformBuf.slice(0,515);
+                console.log(`waveformBuf.length = ${waveformBuf.length}`);
             });
     };
     s.setup = () => {
@@ -87,16 +92,19 @@ new p5((s) => {
     };
     const onModuleLoaded = () => {
         loader = new heavyModule.AudioLibLoader();
-
+        console.log(loader);
+        console.log(heavyModule.Test_AudioLib);
         loader.init({
             blockSize: 2048, // number of samples on each audio processing block
             // printHook: onPrint, // callback for [print] messages, can be null
             // sendHook: onFloatMessage // callback for output parameters [s {name} @hv_param], can be null
         });
         loader.start();
+        loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
     };
     s.mouseClicked = () => {
         if (loader) {
+            // loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
             if (!loader.isPlaying) {
                 loader.start();
             } else {
@@ -104,19 +112,10 @@ new p5((s) => {
             }
             // console.log(loader);
         } else {
-            heavyModule = ThouShalt_Module();
+            // heavyModule = ThouShalt_Module();
+            heavyModule = Test_Module();
             heavyModule['onRuntimeInitialized'] = onModuleLoaded;
 
         }
     };
 }, 'thou-shalt');
-
-/*
-  import osc1 from 'osc'  ;
-  const port = new osc1.WebSocketPort({
-  socket: new WebSocket('ws://localhost:8081')
-  });
-  port.on("message", (oscMessage) => {
-  console.log("message", oscMessage);
-  });
-*/

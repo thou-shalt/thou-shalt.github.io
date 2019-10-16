@@ -25,7 +25,8 @@ module.exports = {
         port: 9000
     },
     externals: {
-        osc: 'osc'
+        Test: 'Test_Module',
+        osc: 'osc',
     },
     node: {
         dgram: 'empty'
