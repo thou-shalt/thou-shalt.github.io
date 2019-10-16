@@ -12,4 +12,5 @@ RUN apt-get update && \
     echo "JAVA = 'java'" >> /root/.emscripten
 
 WORKDIR /opt/hvcc
+
 ENTRYPOINT [ "/usr/bin/python2.7", "hvcc.py", "-g", "js"]
