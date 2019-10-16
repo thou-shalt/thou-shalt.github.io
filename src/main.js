@@ -43,6 +43,11 @@ new p5((s) => {
         }
         kwadrat = s.loadShader('assets/basic.vert', fragPath);
         makeOsc();
+        fetch('assets/waveform.txt')
+            .then(response => response.text())
+            .then((data) => {
+                console.log(data);
+            });
     };
     s.setup = () => {
         let cnv = s.createCanvas(window.innerWidth, window.innerHeight, s.WEBGL);
