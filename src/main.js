@@ -24,7 +24,7 @@ new p5((s) => {
             if (status == -1 || status == 3) {
                 osc.open();
             }
-        }, 1000);
+        }, 1001);
     };
 
     // const fragPath = 'assets/kwadrat_01.frag';
@@ -60,16 +60,22 @@ new p5((s) => {
         s.shader(kwadrat);
         s.noStroke();
         s.frameRate(25);
-        bc = convert.cmyk.rgb(40.0, 100.0, 42.0, 84.0);
+        bc = convert.cmyk.rgb(40.0, 40.0, 42.0, 84.0);
         fc = convert.cmyk.rgb(50.0, 50.0, 42.0, 54.0);
-        // kwadrat.setUniform("uBackgroundColor", bc.map(x => x / 256));
+        console.log(bc);
+        console.log(fc);
+        // fc = s.color(...fc);
+        console.log(bc.push(255));
+        kwadrat.setUniform("uBackgroundColor", bc.map(x => x / 256));
         console.log(bc);
         pg = s.createGraphics(s.width,s.height);
-        pg.background(...bc);
+        pg.background(0,0,0,0);
+        // pg.background(...bc);
         pg.noStroke();
         pg.textFont(font);
         pg.textAlign(s.CENTER);
-        pg.fill(...fc);
+        pg.fill(0,0,1,255);
+        // pg.fill(fc,255);
         pg.textSize(48);
         pg.text('thou shalt net',s.width / 2, s.height / 2);
         kwadrat.setUniform("tex0", pg);
