@@ -52,7 +52,7 @@ void main() {
 
   vec2 rctCoord = vec2(0.5, 0.5);
   float rctMx =
-    rctCntr(coord, rctCoord, vec2(0.5,0.75), vec4(vec2(0.1),vec2(0.05)));
+    rctCntr(coord, rctCoord, vec2(0.5,0.75), vec4(vec2(0.1,0.4),vec2(0.05)));
 
   vec3 clr = mix(backgroundColor, foregroundColor, rctMx);
 

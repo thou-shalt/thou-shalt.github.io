@@ -106,15 +106,20 @@ new p5((s) => {
         console.log(heavyModule.Test_AudioLib);
         loader.init({
             blockSize: 2048, // number of samples on each audio processing block
-            // printHook: onPrint, // callback for [print] messages, can be null
-            // sendHook: onFloatMessage // callback for output parameters [s {name} @hv_param], can be null
+            printHook: (msg => {
+                // console.log(msg);
+            }),
+            sendHook: (msg) => {
+                console.log(""+msg);
+            } // callback for output parameters [s {name} @hv_param], can be null
         });
         loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
+        loader.audiolib.setFloatParameter("waveformLength", waveformBuf.length);
         loader.start();
         s.noCursor();
     };
     s.mouseClicked = () => {
-        if (loader) {
+       if (loader) {
             // loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
             if (!loader.isPlaying) {
                 loader.start();
@@ -129,6 +134,12 @@ new p5((s) => {
             heavyModule = Test_Module();
             heavyModule['onRuntimeInitialized'] = onModuleLoaded;
 
+        }
+    };
+    s.mouseMoved = () => {
+        if(loader) {
+            let freq = s.map(s.mouseX,0,s.width, 110,220);
+            loader.audiolib.setFloatParameter("phasorFreq", freq);
         }
     };
 }, 'thou-shalt');

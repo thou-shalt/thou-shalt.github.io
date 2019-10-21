@@ -44,8 +44,13 @@ extern "C" {
 #endif
 
 typedef enum {
-  HV_TEST_PARAM_IN_WLEN = 0x1992B601, // wLen
+  HV_TEST_PARAM_IN_PHASORFREQ = 0x2F18AC4C, // phasorFreq
+  HV_TEST_PARAM_IN_WAVEFORMLENGTH = 0x44E6072E, // waveformLength
 } Hv_Test_ParameterIn;
+
+typedef enum {
+  HV_TEST_PARAM_OUT_BANG = 0xFFFFFFFF, // bang
+} Hv_Test_ParameterOut;
 
 typedef enum {
   HV_TEST_TABLE_WAVEFORM = 0xCE6D0368, // waveform
