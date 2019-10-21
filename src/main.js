@@ -9,7 +9,15 @@ const options = {
     port: 8081
 };
 
+let bc = convert.cmyk.rgb(18, 97, 4, 19),
+    fc = convert.cmyk.rgb(76, 100, 5, 15);
+
+// const fragPath = 'assets/text.frag';// 'assets/kwadrat_01.frag'
+const fragPath = 'assets/kwadrat_01.frag';
+
 new p5((s) => {
+
+    const normClr = x => 0.0 + (x / 256);
 
     const makeOsc = () => {
         let plugin = new OSC.WebsocketClientPlugin(options);
@@ -27,16 +35,12 @@ new p5((s) => {
         }, 1001);
     };
 
-    // const fragPath = 'assets/kwadrat_01.frag';
-    const fragPath = 'assets/text.frag';
     const drawText = true;
     let font,
         kwadrat,
         strokeColor,
         heavyModule,
         loader,
-        bc,
-        fc,
         pg,
         waveformBuf;
     s.preload = () => {
@@ -60,25 +64,25 @@ new p5((s) => {
         s.shader(kwadrat);
         s.noStroke();
         s.frameRate(25);
-        bc = convert.cmyk.rgb(40.0, 40.0, 42.0, 84.0);
-        fc = convert.cmyk.rgb(50.0, 50.0, 42.0, 54.0);
         console.log(bc);
         console.log(fc);
         // fc = s.color(...fc);
         console.log(bc.push(255));
-        kwadrat.setUniform("uBackgroundColor", bc.map(x => x / 256));
+        kwadrat.setUniform("uBackgroundColor", bc.map(normClr));
+        kwadrat.setUniform("uForegroundColor", fc.map(normClr));
+
         console.log(bc);
         pg = s.createGraphics(s.width,s.height);
-        pg.background(0,0,0,0);
-        // pg.background(...bc);
+        pg.background(0,0);
         pg.noStroke();
         pg.textFont(font);
         pg.textAlign(s.CENTER);
-        pg.fill(0,0,1,255);
-        // pg.fill(fc,255);
-        pg.textSize(48);
+        pg.fill(0,255);
+        pg.textSize(128);
         pg.text('thou shalt net',s.width / 2, s.height / 2);
         kwadrat.setUniform("tex0", pg);
+
+        s.cursor(s.HAND);
     };
 
     s.draw = () => {
@@ -105,16 +109,19 @@ new p5((s) => {
             // printHook: onPrint, // callback for [print] messages, can be null
             // sendHook: onFloatMessage // callback for output parameters [s {name} @hv_param], can be null
         });
-        loader.start();
         loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
+        loader.start();
+        s.noCursor();
     };
     s.mouseClicked = () => {
         if (loader) {
             // loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
             if (!loader.isPlaying) {
                 loader.start();
+                s.noCursor();
             } else {
                 loader.stop();
+                s.cursor(s.HAND);
             }
             // console.log(loader);
         } else {

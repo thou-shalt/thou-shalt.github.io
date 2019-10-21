@@ -11,27 +11,19 @@ varying vec2 vTexCoord;
 uniform vec2 uResolution;
 uniform vec2 uMouse;
 uniform float uTime;
-
 uniform vec3 uBackgroundColor;
+uniform vec3 uForegroundColor;
+uniform sampler2D tex0;
 
-vec3 hsv2rgb(in vec3 c){
-  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-
-void translate2d(inout vec2 pos,
-                  in vec2 xy){
-  pos -= xy;
-}
-
-float rectangle(in vec2 pos,
-                in vec2 rectPos,
+/*
+  zwraca 0 jesli coord jest poza granicami prostokata
+ */
+float rctCntr(in vec2 coord,
+                in vec2 rctCoord,
                 in vec2 size,
                 in vec4 blur){
 
-
-  vec2 posTranslated = pos - rectPos;
+  vec2 coordTranslated = coord - rctCoord;
   vec4 blurClamped =  clamp(blur, vec4(0.0001), vec4(1.0));
 
   vec2 endBlurLeft = -(size/2.0);
@@ -40,8 +32,8 @@ float rectangle(in vec2 pos,
   vec2 endBlurRight = startBlurRight + blurClamped.yw;
 
   vec2 colorMix =
-    smoothstep(startBlurLeft, endBlurLeft, posTranslated) -
-    smoothstep(startBlurRight, endBlurRight, posTranslated);
+    smoothstep(startBlurLeft, endBlurLeft, coordTranslated) -
+    smoothstep(startBlurRight, endBlurRight, coordTranslated);
 
   return colorMix.x * colorMix.y;
 }
@@ -49,24 +41,27 @@ float rectangle(in vec2 pos,
 
 void main() {
 
+  /* lokalizacja fragmentu */
+  vec2 coord = vTexCoord;
+  coord.y = 1.0 - coord.y;
+
   vec3 backgroundColor = uBackgroundColor;
+  vec3 foregroundColor = uForegroundColor;
+  vec3 textColor = uBackgroundColor;
+  vec4 tex = texture2D(tex0, coord);
 
-  vec3 rectColor = hsv2rgb(vec3(0.81, 1.0, 0.04));
+  vec2 rctCoord = vec2(0.5, 0.5);
+  float rctMx =
+    rctCntr(coord, rctCoord, vec2(0.5,0.75), vec4(vec2(0.1),vec2(0.05)));
 
+  vec3 clr = mix(backgroundColor, foregroundColor, rctMx);
 
-  float screenRatio = uResolution.x/uResolution.y;
-  vec2 posNorm = vTexCoord;
-  posNorm.x *= screenRatio;
+  rctMx =
+    rctCntr(coord, rctCoord, vec2(0.75,0.5), vec4(vec2(0.1),vec2(0.1)));
 
-  vec2 rectPos = vec2(0.5*screenRatio, 0.5);
-  float rectMix = rectangle(posNorm, rectPos, vec2(1.0,0.75), vec4(vec2(0.1),vec2(0.01)));
+  clr = mix(clr, foregroundColor, rctMx *0.15);
 
-  vec3 fillColor = mix(backgroundColor, rectColor, rectMix);
+  clr = mix(clr, textColor, tex.a);
 
-  // rectMix = rectangle(posNorm, rectPos, vec2(uMouse.x/uResolution.x,0.5), vec4(vec2(0.0), vec2(0.1)));
-  // rectMix = rectangle(posNorm, rectPos, vec2(10.0*uTime/uResolution.x,0.5), vec4(vec2(0.0), vec2(0.1)));
-
-  fillColor = mix(fillColor, hsv2rgb(vec3(0.3,0.0,0.02)), rectMix);
-
-  gl_FragColor = vec4(fillColor,1.0);
+  gl_FragColor = vec4(clr,1.0);
 }
