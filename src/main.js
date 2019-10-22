@@ -9,8 +9,8 @@ const options = {
     port: 8081
 };
 
-let bc = convert.cmyk.rgb(18, 97, 4, 19),
-    fc = convert.cmyk.rgb(76, 100, 5, 15);
+let bc = convert.cmyk.rgb(18, 97, 4, 89),
+    fc = convert.cmyk.rgb(76, 100, 5, 85);
 
 // const fragPath = 'assets/text.frag';// 'assets/kwadrat_01.frag'
 const fragPath = 'assets/kwadrat_01.frag';
@@ -19,6 +19,18 @@ new p5((s) => {
 
     const normClr = x => 0.0 + (x / 256);
 
+    const getAudio= (audioCtx, file) => {
+        fetch(file)
+            .then(response => response.arrayBuffer()
+                  .then(arrBuf => {
+                      console.log(arrBuf);
+                      audioCtx.decodeAudioData(arrBuf, (audioBuf) => {
+                          console.log(audioBuf);
+                          console.log(audioBuf.getChannelData(0).length);
+                          audioBuf.getChannelData(0).slice(10000,11000).forEach(i => console.log(i));
+                      });
+                  }));
+    };
     const makeOsc = () => {
         let plugin = new OSC.WebsocketClientPlugin(options);
         let osc = new OSC({ plugin: plugin });
@@ -43,12 +55,18 @@ new p5((s) => {
         loader,
         pg,
         waveformBuf;
+
     s.preload = () => {
         if (drawText) {
             font = s.loadFont('assets/OCRA.otf');
         }
         kwadrat = s.loadShader('assets/basic.vert', fragPath);
         makeOsc();
+
+        let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        console.log(audioCtx);
+        getAudio(audioCtx,'assets/wa_tanzbar_snare_01.ogg');
+
         fetch('assets/waveform.txt')
             .then(response => response.text())
             .then((data) => {
@@ -58,6 +76,7 @@ new p5((s) => {
                 console.log(`waveformBuf.length = ${waveformBuf.length}`);
             });
     };
+
     s.setup = () => {
         let cnv = s.createCanvas(window.innerWidth, window.innerHeight, s.WEBGL);
         cnv.canvas.style.display = 'block';
