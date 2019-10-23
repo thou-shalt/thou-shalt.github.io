@@ -45,21 +45,20 @@ void main() {
   vec2 coord = vTexCoord;
   coord.y = 1.0 - coord.y;
 
-  vec3 backgroundColor = uBackgroundColor;
-  vec3 foregroundColor = uForegroundColor;
   vec3 textColor = uBackgroundColor;
   vec4 tex = texture2D(tex0, coord);
 
-  vec2 rctCoord = vec2(0.5, 0.5);
+  vec2 rctCoord = vec2(0.25, 0.5);
   float rctMx =
-    rctCntr(coord, rctCoord, vec2(0.5,0.75), vec4(vec2(0.1),vec2(0.05)));
+    rctCntr(coord, rctCoord, vec2(0.5,0.9), vec4(0.1,0.0,0.1,0.1));
 
-  vec3 clr = mix(backgroundColor, foregroundColor, rctMx);
+  vec3 clr = mix(vec3(0.0), uForegroundColor, rctMx);
 
+  rctCoord = vec2(0.75, 0.5);
   rctMx =
-    rctCntr(coord, rctCoord, vec2(0.75,0.5), vec4(vec2(0.1),vec2(0.1)));
+    rctCntr(coord, rctCoord, vec2(0.5,1.0), vec4(0.1,0.0,0.0,0.0));
 
-  clr = mix(clr, foregroundColor, rctMx *0.15);
+  clr = mix(clr, uBackgroundColor, rctMx);
 
   clr = mix(clr, textColor, tex.a);
 

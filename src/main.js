@@ -9,8 +9,8 @@ const options = {
     port: 8081
 };
 
-let bc = convert.cmyk.rgb(18, 97, 4, 89),
-    fc = convert.cmyk.rgb(76, 100, 5, 85);
+let bc = convert.cmyk.rgb(18, 97, 4, 9),
+    fc = convert.cmyk.rgb(76, 100, 5, 5);
 
 // const fragPath = 'assets/text.frag';// 'assets/kwadrat_01.frag'
 const fragPath = 'assets/kwadrat_01.frag';
@@ -19,7 +19,7 @@ new p5((s) => {
 
     const normClr = x => 0.0 + (x / 256);
 
-    const getAudio= (audioCtx, file) => {
+    const getAudio = (audioCtx, file) => {
         fetch(file)
             .then(response => response.arrayBuffer()
                   .then(arrBuf => {
@@ -64,7 +64,6 @@ new p5((s) => {
         makeOsc();
 
         let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        console.log(audioCtx);
         getAudio(audioCtx,'assets/wa_tanzbar_snare_01.ogg');
 
         fetch('assets/waveform.txt')
