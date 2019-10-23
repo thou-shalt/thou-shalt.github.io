@@ -59,6 +59,7 @@
           webAudioContext: null
         });
         updateSlider_phasorFreq(0.5);
+        updateSlider_waveformDur(0.5);
         updateSlider_waveformLength(0.5);
         document.getElementById("transportButton").style.visibility = "visible";
       }
@@ -88,6 +89,11 @@
         loader.audiolib.setFloatParameter("phasorFreq", value);
       }
 
+      function updateSlider_waveformDur(value) {
+        document.getElementById("value_waveformDur").textContent = Number(value).toFixed(2);
+        loader.audiolib.setFloatParameter("waveformDur", value);
+      }
+
       function updateSlider_waveformLength(value) {
         document.getElementById("value_waveformLength").textContent = Number(value).toFixed(2);
         loader.audiolib.setFloatParameter("waveformLength", value);
@@ -112,6 +118,13 @@
           <input id="parameter_phasorFreq" type="range" min="0.0" max="1.0" step="0.01" value="0.5" onchange="updateSlider_phasorFreq(value);" oninput="updateSlider_phasorFreq(value)">
         </div>
         <div class="col parameter-value" id="value_phasorFreq">0.5</div>
+      </div>
+      <div class="row">
+        <div class="col parameter-name">waveformDur</div>
+        <div class="col parameter-slider">
+          <input id="parameter_waveformDur" type="range" min="0.0" max="1.0" step="0.01" value="0.5" onchange="updateSlider_waveformDur(value);" oninput="updateSlider_waveformDur(value)">
+        </div>
+        <div class="col parameter-value" id="value_waveformDur">0.5</div>
       </div>
       <div class="row">
         <div class="col parameter-name">waveformLength</div>

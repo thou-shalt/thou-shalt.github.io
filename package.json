@@ -11,7 +11,8 @@
   "dependencies": {
     "color-convert": "^2.0.1",
     "compression-webpack-plugin": "^3.0.0",
-    "osc-js": "^2.0.4"
+    "osc-js": "^2.0.4",
+    "tone": "^13.8.25"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

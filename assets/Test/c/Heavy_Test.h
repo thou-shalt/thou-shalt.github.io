@@ -45,6 +45,7 @@ extern "C" {
 
 typedef enum {
   HV_TEST_PARAM_IN_PHASORFREQ = 0x2F18AC4C, // phasorFreq
+  HV_TEST_PARAM_IN_WAVEFORMDUR = 0xD8701EA9, // waveformDur
   HV_TEST_PARAM_IN_WAVEFORMLENGTH = 0x44E6072E, // waveformLength
 } Hv_Test_ParameterIn;
 

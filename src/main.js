@@ -3,20 +3,24 @@ import convert from 'color-convert';
 import ThouShalt_Module from '../assets/ThouShalt/js/ThouShalt.js';
 import Test_Module from 'Test';
 import OSC from 'osc-js';
+import Tone from 'tone';
+
 
 const options = {
     host: 'localhost',
     port: 8081
 };
 
-let bc = convert.cmyk.rgb(18, 97, 4, 9),
-    fc = convert.cmyk.rgb(76, 100, 5, 5);
+let synth = new Tone.FMSynth().toMaster();
+
+let bc = convert.cmyk.rgb(18, 97, 4, 89),
+    fc = convert.cmyk.rgb(76, 100, 5, 85);
 
 // const fragPath = 'assets/text.frag';// 'assets/kwadrat_01.frag'
 const fragPath = 'assets/kwadrat_01.frag';
 
 new p5((s) => {
-
+    synth.triggerAttackRelease("C2", 0.5, Tone.time);
     const normClr = x => 0.0 + (x / 256);
 
     const getAudio = (audioCtx, file) => {
@@ -25,9 +29,12 @@ new p5((s) => {
                   .then(arrBuf => {
                       console.log(arrBuf);
                       audioCtx.decodeAudioData(arrBuf, (audioBuf) => {
-                          console.log(audioBuf);
-                          console.log(audioBuf.getChannelData(0).length);
-                          audioBuf.getChannelData(0).slice(10000,11000).forEach(i => console.log(i));
+                          console.log('audioBuf.sampleRate '+audioBuf.sampleRate);
+                          console.log(1.0/audioBuf.duration);
+                          waveformDur = audioBuf.duration;
+                          waveformBuf = audioBuf.getChannelData(0);
+                          // console.log(audioBuf.getChannelData(0).length);
+                          // audioBuf.getChannelData(0).slice(10000,11000).forEach(i => console.log(i));
                       });
                   }));
     };
@@ -44,7 +51,7 @@ new p5((s) => {
             if (status == -1 || status == 3) {
                 osc.open();
             }
-        }, 1001);
+        }, 1000*60);
     };
 
     const drawText = true;
@@ -54,6 +61,7 @@ new p5((s) => {
         heavyModule,
         loader,
         pg,
+        waveformDur,
         waveformBuf;
 
     s.preload = () => {
@@ -66,7 +74,21 @@ new p5((s) => {
         let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         getAudio(audioCtx,'assets/wa_tanzbar_snare_01.ogg');
 
-        fetch('assets/waveform.txt')
+        Tone.Transport.start();
+
+        let snare = new Tone.Buffer(
+            'assets/wa_tanzbar_snare_01.ogg',
+            ()=>{
+                const seq = new Tone.Sequence((time, note) => {
+                    // console.log([time, note]);
+                    let s = new Tone.BufferSource(snare.get()).toMaster();
+                    s.onended = () => s.dispose();
+                    s.start();
+                },[120,120] ,'8n');
+                seq.start(0).stop(1);
+            });
+        /*
+          fetch('assets/waveform.txt')
             .then(response => response.text())
             .then((data) => {
                 waveformBuf = Float32Array.from(
@@ -74,6 +96,7 @@ new p5((s) => {
                 waveformBuf = waveformBuf.slice(0,515);
                 console.log(`waveformBuf.length = ${waveformBuf.length}`);
             });
+         */
     };
 
     s.setup = () => {
@@ -104,8 +127,6 @@ new p5((s) => {
     };
 
     s.draw = () => {
-        s.camera(0, 0, 20 + s.sin(s.frameCount * 0.01) * 10, 0, 0, 0, 0, 1, 0);
-        // console.log(s.frameCount );
         let z = 1.0;
         // kwadrat.setUniform("tex0", pg);
         // kwadrat.setUniform("uResolution", [s.width, s.height]);
@@ -133,12 +154,13 @@ new p5((s) => {
         });
         loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
         loader.audiolib.setFloatParameter("waveformLength", waveformBuf.length);
+        loader.audiolib.setFloatParameter("waveformDur", waveformDur*1);
         loader.start();
         s.noCursor();
     };
     s.mouseClicked = () => {
-       if (loader) {
-            // loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
+        if (loader) {
+            loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
             if (!loader.isPlaying) {
                 loader.start();
                 s.noCursor();
