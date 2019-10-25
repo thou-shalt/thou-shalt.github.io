@@ -11,17 +11,16 @@ const options = {
     port: 8081
 };
 
-let synth = new Tone.FMSynth().toMaster();
 
 let bc = convert.cmyk.rgb(18, 97, 4, 89),
-    fc = convert.cmyk.rgb(76, 100, 5, 85);
+    fc = convert.cmyk.rgb(76, 100, 5, 5);
 
 // const fragPath = 'assets/text.frag';// 'assets/kwadrat_01.frag'
 const fragPath = 'assets/kwadrat_01.frag';
 
 new p5((s) => {
-    synth.triggerAttackRelease("C2", 0.5, Tone.time);
     const normClr = x => 0.0 + (x / 256);
+
 
     const getAudio = (audioCtx, file) => {
         fetch(file)
@@ -74,29 +73,30 @@ new p5((s) => {
         let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         getAudio(audioCtx,'assets/wa_tanzbar_snare_01.ogg');
 
-        Tone.Transport.start();
 
-        let snare = new Tone.Buffer(
-            'assets/wa_tanzbar_snare_01.ogg',
-            ()=>{
-                const seq = new Tone.Sequence((time, note) => {
-                    // console.log([time, note]);
-                    let s = new Tone.BufferSource(snare.get()).toMaster();
-                    s.onended = () => s.dispose();
-                    s.start();
-                },[120,120] ,'8n');
-                seq.start(0).stop(1);
-            });
         /*
+          Tone.Transport.start();
+          let snare = new Tone.Buffer(
+          'assets/wa_tanzbar_snare_01.ogg',
+          ()=>{
+          const seq = new Tone.Sequence((time, note) => {
+          // console.log([time, note]);
+          let s = new Tone.BufferSource(snare.get()).toMaster();
+          s.onended = () => s.dispose();
+          s.start();
+          },[120,120] ,'8n');
+          // seq.start(0).stop(1);
+          });
           fetch('assets/waveform.txt')
-            .then(response => response.text())
-            .then((data) => {
-                waveformBuf = Float32Array.from(
-                    data.split(/\r?\n/).map((v,i) => parseFloat(v)));
-                waveformBuf = waveformBuf.slice(0,515);
-                console.log(`waveformBuf.length = ${waveformBuf.length}`);
-            });
-         */
+          .then(response => response.text())
+          .then((data) => {
+          waveformBuf = Float32Array.from(
+          data.split(/\r?\n/).map((v,i) => parseFloat(v)));
+          waveformBuf = waveformBuf.slice(0,515);
+          console.log(`waveformBuf.length = ${waveformBuf.length}`);
+          });
+        */
+
     };
 
     s.setup = () => {
@@ -124,12 +124,12 @@ new p5((s) => {
         kwadrat.setUniform("tex0", pg);
 
         s.cursor(s.HAND);
+        kwadrat.setUniform("uResolution", [s.width, s.height]);
     };
 
     s.draw = () => {
         let z = 1.0;
         // kwadrat.setUniform("tex0", pg);
-        // kwadrat.setUniform("uResolution", [s.width, s.height]);
         // kwadrat.setUniform("uMouse", [s.mouseX, s.mouseY]);
         // kwadrat.setUniform("uTime", s.millis() % (s.width / 8.0));
         s.quad(-1, -1, z, 1, -1, z, 1, 1, z, -1, 1, z);
@@ -138,6 +138,7 @@ new p5((s) => {
 
     s.windowResized = () => {
         s.resizeCanvas(window.innerWidth, window.innerHeight);
+        kwadrat.setUniform("uResolution", [s.width, s.height]);
     };
     const onModuleLoaded = () => {
         loader = new heavyModule.AudioLibLoader();
@@ -160,7 +161,6 @@ new p5((s) => {
     };
     s.mouseClicked = () => {
         if (loader) {
-            loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
             if (!loader.isPlaying) {
                 loader.start();
                 s.noCursor();

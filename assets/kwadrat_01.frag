@@ -15,9 +15,21 @@ uniform vec3 uBackgroundColor;
 uniform vec3 uForegroundColor;
 uniform sampler2D tex0;
 
-/*
-  zwraca 0 jesli coord jest poza granicami prostokata
- */
+float rct(in vec2 coord,
+           in vec2 topLeft,
+           in vec2 bottomRight,
+           in vec4 blur) {
+
+  vec4 blurClamped =  clamp(blur, vec4(0.0001), vec4(1.0));
+  vec2 colorMix  =
+    smoothstep(topLeft - blur.xy, topLeft, coord)
+    - smoothstep(bottomRight, bottomRight + blur.zw, coord);
+
+  return colorMix.x * colorMix.y;
+
+}
+
+
 float rctCntr(in vec2 coord,
                 in vec2 rctCoord,
                 in vec2 size,
@@ -45,22 +57,24 @@ void main() {
   vec2 coord = vTexCoord;
   coord.y = 1.0 - coord.y;
 
+  float ratioY = uResolution.y/uResolution.x;
+  float ratioX = uResolution.x/uResolution.y;
+
+  //coord.y = coord.y * ratioY;// -vec2(0.375,0.125)
+  coord.x = coord.x * ratioX;// -vec2(0.375,0.125)
+
   vec3 textColor = uBackgroundColor;
   vec4 tex = texture2D(tex0, coord);
 
-  vec2 rctCoord = vec2(0.25, 0.5);
-  float rctMx =
-    rctCntr(coord, rctCoord, vec2(0.5,0.9), vec4(0.1,0.0,0.1,0.1));
+  vec2 topLeft = vec2(0.0,0.0);
+  vec2 bottomRight = vec2(0.2, 0.2);
+  vec4 blur = vec4(0.5, 0.0,0.5, 0.0);
+  vec2 offset = vec2(0.45, 0.4);
+  offset.x = offset.x * ratioX;
+  float rect = rct(coord - offset, topLeft, bottomRight, blur);
 
-  vec3 clr = mix(vec3(0.0), uForegroundColor, rctMx);
-
-  rctCoord = vec2(0.75, 0.5);
-  rctMx =
-    rctCntr(coord, rctCoord, vec2(0.5,1.0), vec4(0.1,0.0,0.0,0.0));
-
-  clr = mix(clr, uBackgroundColor, rctMx);
-
-  clr = mix(clr, textColor, tex.a);
+  vec3 clr = mix(uBackgroundColor, uForegroundColor, rect);
+  // clr = mix(clr, textColor, tex.a);
 
   gl_FragColor = vec4(clr,1.0);
 }
