@@ -1,0 +1,10 @@
+#N canvas 1047 42 632 224 12;
+#X obj 39 87 dac~;
+#X obj 33 51 tabplay~ waveform;
+#X obj 176 78 table waveformTable 515 @hv_table;
+#X obj 226 10 loadbang;
+#X msg 226 34 set waveformTable;
+#X connect 1 0 0 1;
+#X connect 1 0 0 0;
+#X connect 3 0 4 0;
+#X connect 4 0 1 0;
