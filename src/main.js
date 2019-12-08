@@ -12,7 +12,7 @@ const options = {
 };
 
 
-let bc = convert.cmyk.rgb(18, 97, 4, 89),
+let bc = convert.cmyk.rgb(18, 97, 36, 89),
     fc = convert.cmyk.rgb(76, 100, 5, 5);
 
 // const fragPath = 'assets/text.frag';// 'assets/kwadrat_01.frag'
@@ -25,24 +25,27 @@ new p5((s) => {
     const getAudio = (audioCtx, file) => {
         fetch(file)
             .then(response => response.arrayBuffer()
-                  .then(arrBuf => {
-                      console.log(arrBuf);
-                      audioCtx.decodeAudioData(arrBuf, (audioBuf) => {
-                          console.log('audioBuf.sampleRate '+audioBuf.sampleRate);
-                          console.log(1.0/audioBuf.duration);
-                          waveformDur = audioBuf.duration;
-                          waveformBuf = audioBuf.getChannelData(0);
-                          // console.log(audioBuf.getChannelData(0).length);
-                          // audioBuf.getChannelData(0).slice(10000,11000).forEach(i => console.log(i));
-                      });
-                  }));
+                .then(arrBuf => {
+                    console.log(arrBuf);
+                    audioCtx.decodeAudioData(arrBuf, (audioBuf) => {
+                        console.log('audioBuf.sampleRate ' + audioBuf.sampleRate);
+                        console.log(1.0 / audioBuf.duration);
+                        waveformDur = audioBuf.duration;
+                        waveformBuf = audioBuf.getChannelData(0);
+                        // console.log(audioBuf.getChannelData(0).length);
+                        // audioBuf.getChannelData(0).slice(10000,11000).forEach(i => console.log(i));
+                    });
+                }));
     };
-    const makeOsc = () => {
+    const makeOsc = (frag) => {
         let plugin = new OSC.WebsocketClientPlugin(options);
-        let osc = new OSC({ plugin: plugin });
+        let osc = new OSC({
+            plugin: plugin
+        });
 
-        osc.on('/dog/ferret', (msg) => {
+        osc.on('/test/test', (msg) => {
             console.log(msg);
+            // frag.setUniform()
         });
 
         setInterval(() => {
@@ -50,7 +53,7 @@ new p5((s) => {
             if (status == -1 || status == 3) {
                 osc.open();
             }
-        }, 1000*60);
+        }, 1000 * 60);
     };
 
     const drawText = true;
@@ -68,10 +71,10 @@ new p5((s) => {
             font = s.loadFont('assets/OCRA.otf');
         }
         kwadrat = s.loadShader('assets/basic.vert', fragPath);
-        makeOsc();
+        makeOsc(kwadrat);
 
-        let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        getAudio(audioCtx,'assets/wa_tanzbar_snare_01.ogg');
+        let audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+        getAudio(audioCtx, 'assets/wa_tanzbar_snare_01.ogg');
 
 
         /*
@@ -110,17 +113,19 @@ new p5((s) => {
         // fc = s.color(...fc);
         console.log(bc.push(255));
         kwadrat.setUniform("uBackgroundColor", bc.map(normClr));
+        // kwadrat.setUniform("uBackgroundColor", [1.0,1.0,1.0]);
         kwadrat.setUniform("uForegroundColor", fc.map(normClr));
+        // kwadrat.setUniform("uForegroundColor", [1,0,0.3]);
 
         console.log(bc);
-        pg = s.createGraphics(s.width,s.height);
-        pg.background(0,0);
+        pg = s.createGraphics(s.width, s.height);
+        pg.background(0, 0);
         pg.noStroke();
         pg.textFont(font);
         pg.textAlign(s.CENTER);
-        pg.fill(0,255);
+        pg.fill(0, 255);
         pg.textSize(128);
-        pg.text('thou shalt net',s.width / 2, s.height / 2);
+        pg.text('thou shalt net', s.width / 2, s.height / 2);
         kwadrat.setUniform("tex0", pg);
 
         s.cursor(s.HAND);
@@ -150,12 +155,12 @@ new p5((s) => {
                 // console.log(msg);
             }),
             sendHook: (msg) => {
-                console.log(""+msg);
+                console.log("" + msg);
             } // callback for output parameters [s {name} @hv_param], can be null
         });
         loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
         loader.audiolib.setFloatParameter("waveformLength", waveformBuf.length);
-        loader.audiolib.setFloatParameter("waveformDur", waveformDur*1);
+        loader.audiolib.setFloatParameter("waveformDur", waveformDur * 1);
         loader.start();
         s.noCursor();
     };
@@ -177,8 +182,8 @@ new p5((s) => {
         }
     };
     s.mouseMoved = () => {
-        if(loader) {
-            let freq = s.map(s.mouseX,0,s.width, 110,220);
+        if (loader) {
+            let freq = s.map(s.mouseX, 0, s.width, 110, 220);
             loader.audiolib.setFloatParameter("phasorFreq", freq);
         }
     };

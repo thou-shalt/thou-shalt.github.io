@@ -22,8 +22,8 @@ float rct(in vec2 coord,
 
   vec4 blurClamped =  clamp(blur, vec4(0.0001), vec4(1.0));
   vec2 colorMix  =
-    smoothstep(topLeft - blur.xy, topLeft, coord)
-    - smoothstep(bottomRight, bottomRight + blur.zw, coord);
+    smoothstep(topLeft - blurClamped.xy, topLeft, coord)
+    - smoothstep(bottomRight, bottomRight + blurClamped.zw, coord);
 
   return colorMix.x * colorMix.y;
 
@@ -68,13 +68,15 @@ void main() {
 
   vec2 topLeft = vec2(0.0,0.0);
   vec2 bottomRight = vec2(0.2, 0.2);
-  vec4 blur = vec4(0.5, 0.0,0.5, 0.0);
+  vec4 blur = vec4(0.05, 0.0,0.05, 0.0);
   vec2 offset = vec2(0.45, 0.4);
   offset.x = offset.x * ratioX;
   float rect = rct(coord - offset, topLeft, bottomRight, blur);
 
   vec3 clr = mix(uBackgroundColor, uForegroundColor, rect);
+  // vec3 clr = mix(uBackgroundColor, uForegroundColor, 0.2);
   // clr = mix(clr, textColor, tex.a);
 
   gl_FragColor = vec4(clr,1.0);
+  // gl_FragColor = vec4(clr,1.0);
 }
