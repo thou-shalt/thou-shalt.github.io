@@ -1,9 +1,7 @@
 import p5 from './p5.min.js';
 import convert from 'color-convert';
-import ThouShalt_Module from '../assets/ThouShalt/js/ThouShalt.js';
-import Test_Module from 'Test';
+import anime from 'animejs/lib/anime.es.js';
 import OSC from 'osc-js';
-import Tone from 'tone';
 
 
 const options = {
@@ -12,40 +10,37 @@ const options = {
 };
 
 
-let bc = convert.cmyk.rgb(18, 97, 36, 89),
-    fc = convert.cmyk.rgb(76, 100, 5, 5);
+let bc = convert.cmyk.rgb(0, 47, 36, 90),
+    fc = convert.cmyk.rgb(3, 0, 0, 0);
 
-// const fragPath = 'assets/text.frag';// 'assets/kwadrat_01.frag'
-const fragPath = 'assets/kwadrat_01.frag';
+const fragPath = 'assets/thou_shalt_scene_01.frag';
 
 new p5((s) => {
     const normClr = x => 0.0 + (x / 256);
+    var resetTimer = s.millis();
 
-
-    const getAudio = (audioCtx, file) => {
-        fetch(file)
-            .then(response => response.arrayBuffer()
-                .then(arrBuf => {
-                    console.log(arrBuf);
-                    audioCtx.decodeAudioData(arrBuf, (audioBuf) => {
-                        console.log('audioBuf.sampleRate ' + audioBuf.sampleRate);
-                        console.log(1.0 / audioBuf.duration);
-                        waveformDur = audioBuf.duration;
-                        waveformBuf = audioBuf.getChannelData(0);
-                        // console.log(audioBuf.getChannelData(0).length);
-                        // audioBuf.getChannelData(0).slice(10000,11000).forEach(i => console.log(i));
-                    });
-                }));
-    };
     const makeOsc = (frag) => {
         let plugin = new OSC.WebsocketClientPlugin(options);
         let osc = new OSC({
             plugin: plugin
         });
 
-        osc.on('/test/test', (msg) => {
-            console.log(msg);
-            // frag.setUniform()
+        osc.on('/thou-shalt/scene_01', (msg) => {
+            // console.log(msg);
+            anime({
+                targets: uTime,
+                keyframes: [
+                    {value: 1.0, duration: 10},
+                    {value: 0.0, delay: 50, duration: 100},
+                ],
+                direction: 'normal',
+                easing: 'easeInQuad',
+                // duration: 100,
+                // loop: true,
+                update: () => {
+                    kwadrat.setUniform("uTime", uTime.value);
+                }
+            });
         });
 
         setInterval(() => {
@@ -53,53 +48,18 @@ new p5((s) => {
             if (status == -1 || status == 3) {
                 osc.open();
             }
-        }, 1000 * 60);
+        }, 1000);
     };
 
-    const drawText = true;
-    let font,
-        kwadrat,
-        strokeColor,
-        heavyModule,
-        loader,
-        pg,
-        waveformDur,
-        waveformBuf;
+    let kwadrat;
+
+    let uTime = {
+        value: 0.0,
+    };
 
     s.preload = () => {
-        if (drawText) {
-            font = s.loadFont('assets/OCRA.otf');
-        }
         kwadrat = s.loadShader('assets/basic.vert', fragPath);
         makeOsc(kwadrat);
-
-        let audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-        getAudio(audioCtx, 'assets/wa_tanzbar_snare_01.ogg');
-
-
-        /*
-          Tone.Transport.start();
-          let snare = new Tone.Buffer(
-          'assets/wa_tanzbar_snare_01.ogg',
-          ()=>{
-          const seq = new Tone.Sequence((time, note) => {
-          // console.log([time, note]);
-          let s = new Tone.BufferSource(snare.get()).toMaster();
-          s.onended = () => s.dispose();
-          s.start();
-          },[120,120] ,'8n');
-          // seq.start(0).stop(1);
-          });
-          fetch('assets/waveform.txt')
-          .then(response => response.text())
-          .then((data) => {
-          waveformBuf = Float32Array.from(
-          data.split(/\r?\n/).map((v,i) => parseFloat(v)));
-          waveformBuf = waveformBuf.slice(0,515);
-          console.log(`waveformBuf.length = ${waveformBuf.length}`);
-          });
-        */
-
     };
 
     s.setup = () => {
@@ -110,81 +70,27 @@ new p5((s) => {
         s.frameRate(25);
         console.log(bc);
         console.log(fc);
-        // fc = s.color(...fc);
         console.log(bc.push(255));
         kwadrat.setUniform("uBackgroundColor", bc.map(normClr));
-        // kwadrat.setUniform("uBackgroundColor", [1.0,1.0,1.0]);
         kwadrat.setUniform("uForegroundColor", fc.map(normClr));
-        // kwadrat.setUniform("uForegroundColor", [1,0,0.3]);
 
         console.log(bc);
-        pg = s.createGraphics(s.width, s.height);
-        pg.background(0, 0);
-        pg.noStroke();
-        pg.textFont(font);
-        pg.textAlign(s.CENTER);
-        pg.fill(0, 255);
-        pg.textSize(128);
-        pg.text('thou shalt net', s.width / 2, s.height / 2);
-        kwadrat.setUniform("tex0", pg);
 
         s.cursor(s.HAND);
         kwadrat.setUniform("uResolution", [s.width, s.height]);
+
+        
     };
 
     s.draw = () => {
-        let z = 1.0;
-        // kwadrat.setUniform("tex0", pg);
-        // kwadrat.setUniform("uMouse", [s.mouseX, s.mouseY]);
-        // kwadrat.setUniform("uTime", s.millis() % (s.width / 8.0));
-        s.quad(-1, -1, z, 1, -1, z, 1, 1, z, -1, 1, z);
+        // let z = ((135.0 / 60) * ((s.millis() - resetTimer) / 1000.0)) % 1.0;
+        // kwadrat.setUniform("uTime", z);
+        s.quad(-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0);
 
     };
 
     s.windowResized = () => {
         s.resizeCanvas(window.innerWidth, window.innerHeight);
         kwadrat.setUniform("uResolution", [s.width, s.height]);
-    };
-    const onModuleLoaded = () => {
-        loader = new heavyModule.AudioLibLoader();
-        console.log(loader);
-        console.log(heavyModule.Test_AudioLib);
-        loader.init({
-            blockSize: 2048, // number of samples on each audio processing block
-            printHook: (msg => {
-                // console.log(msg);
-            }),
-            sendHook: (msg) => {
-                console.log("" + msg);
-            } // callback for output parameters [s {name} @hv_param], can be null
-        });
-        loader.audiolib.fillTableWithFloatBuffer('waveform', waveformBuf);
-        loader.audiolib.setFloatParameter("waveformLength", waveformBuf.length);
-        loader.audiolib.setFloatParameter("waveformDur", waveformDur * 1);
-        loader.start();
-        s.noCursor();
-    };
-    s.mouseClicked = () => {
-        if (loader) {
-            if (!loader.isPlaying) {
-                loader.start();
-                s.noCursor();
-            } else {
-                loader.stop();
-                s.cursor(s.HAND);
-            }
-            // console.log(loader);
-        } else {
-            // heavyModule = ThouShalt_Module();
-            heavyModule = Test_Module();
-            heavyModule['onRuntimeInitialized'] = onModuleLoaded;
-
-        }
-    };
-    s.mouseMoved = () => {
-        if (loader) {
-            let freq = s.map(s.mouseX, 0, s.width, 110, 220);
-            loader.audiolib.setFloatParameter("phasorFreq", freq);
-        }
     };
 }, 'thou-shalt');
