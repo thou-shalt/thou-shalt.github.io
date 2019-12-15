@@ -16,9 +16,9 @@ uniform vec3 uForegroundColor;
 uniform sampler2D tex0;
 
 float rct(in vec2 coord,
-           in vec2 topLeft,
-           in vec2 bottomRight,
-           in vec4 blur) {
+          in vec2 topLeft,
+          in vec2 bottomRight,
+          in vec4 blur) {
 
   vec4 blurClamped =  clamp(blur, vec4(0.0001), vec4(1.0));
   vec2 colorMix  =
@@ -31,9 +31,9 @@ float rct(in vec2 coord,
 
 
 float rctCntr(in vec2 coord,
-                in vec2 rctCoord,
-                in vec2 size,
-                in vec4 blur){
+              in vec2 rctCoord,
+              in vec2 size,
+              in vec4 blur){
 
   vec2 coordTranslated = coord - rctCoord;
   vec4 blurClamped =  clamp(blur, vec4(0.0001), vec4(1.0));
